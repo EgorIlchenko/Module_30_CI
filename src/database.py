@@ -7,5 +7,9 @@ DATABASE_URL: str = "sqlite+aiosqlite:///./recipes.db"
 engine = create_async_engine(DATABASE_URL)
 
 async_session = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
-session = async_session()
 Base = declarative_base()
+
+
+async def get_session() -> AsyncSession:
+    async with async_session() as session:
+        yield session
