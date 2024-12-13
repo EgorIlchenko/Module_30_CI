@@ -1,4 +1,4 @@
-from src.main import app
+from main import app
 from fastapi.testclient import TestClient
 
 client = TestClient(app)
@@ -7,23 +7,6 @@ client = TestClient(app)
 def test_get_recipes():
     response = client.get('/recipes/')
     assert response.status_code == 200
-
-
-def test_get_recipe_id():
-    response = client.get('/recipes/5')
-    assert response.status_code == 200
-    assert response.json() == {
-      "name": "test",
-      "cooking_time": 10,
-      "ingredients": "test_ingredients",
-      "description": "test_description"
-    }
-
-
-def test_get_recipe_id_wrong_id():
-    response = client.get('/recipes/50')
-    assert response.status_code == 404
-    assert response.json() == {"detail": "Упс! Рецепт не найден!"}
 
 
 def test_post_recipe():
@@ -39,6 +22,23 @@ def test_post_recipe():
         "ingredients": "test_ingredients",
         "description": "test_description"
     }
+
+
+def test_get_recipe_id():
+    response = client.get('/recipes/1')
+    assert response.status_code == 200
+    assert response.json() == {
+      "name": "test",
+      "cooking_time": 10,
+      "ingredients": "test_ingredients",
+      "description": "test_description"
+    }
+
+
+def test_get_recipe_id_wrong_id():
+    response = client.get('/recipes/50')
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Упс! Рецепт не найден!"}
 
 
 def test_post_recipe_with_wrong_validation():
@@ -89,9 +89,9 @@ def test_post_recipe_with_wrong_type_validation():
 
 
 def test_delete_recipe_id():
-    response = client.delete('/recipes/6')
+    response = client.delete('/recipes/1')
     assert response.status_code == 200
-    assert response.json() == "Товар с id 6 успешно удален!", 200
+    assert response.json() == "Товар с id 1 успешно удален!", 200
 
 
 def test_delete_recipe_id_with_wrong_id():
