@@ -1,14 +1,14 @@
 import pytest
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
-from database import Base, get_session
-from main import app
+from src.database import Base, get_session
+from src.main import app
 from fastapi.testclient import TestClient
 
-# Настройка тестовой базы данных
 TEST_DATABASE_URL = "sqlite+aiosqlite:///./test.db"
 test_engine = create_async_engine(TEST_DATABASE_URL, echo=True)
 TestSessionLocal = sessionmaker(bind=test_engine, class_=AsyncSession, expire_on_commit=False)
+
 
 @pytest.fixture(scope="session")
 async def initialize_database():
@@ -20,6 +20,7 @@ async def initialize_database():
     yield
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
+
 
 @pytest.fixture(scope="function")
 async def session_override(initialize_database):
@@ -33,6 +34,7 @@ async def session_override(initialize_database):
     app.dependency_overrides[get_session] = override_get_session
     yield
     app.dependency_overrides.pop(get_session, None)
+
 
 @pytest.fixture(scope="function")
 def client(session_override):
